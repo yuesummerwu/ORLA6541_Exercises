@@ -16,7 +16,7 @@ There were five required exercises in total, covering the following topics:
 
 # File Formats 
 
-All exercises were done using R Studio and the codes were written in Rmarkdown. For better preview on Github, a markdoown version for each exercise was also offered. However, Especially, some references were added using R-built-in functions, so they might not have been rendered in those markdown files, sp I recommended viewing the html file for the best readability, which can be found below. 
+All exercises were done using R Studio and the codes were written in Rmarkdown. For better preview on Github, a markdoown version for each exercise was also offered. However, some references were added using R-built-in functions, so they might not have been rendered in those markdown files, sp I recommended viewing the html file for the best readability, which can be found below. 
 
 |Exercise|Link|
 |--------|----|
@@ -31,7 +31,7 @@ Each exercise was designed by Dr. Bowers for practicing different data science t
 
 | Exercise | Topics | Datasets | References |
 |----------|----------|----------|----------| 
-| Exercise 1  | Basic Usage of R; Data Visualization  | `nycflights13`; `pisa`  |-| 
+| Exercise 1  | Basic Usage of R; Data Visualization  | `nycflights13`; `pisa`  |Bulut & Desjardins, 2019; | 
 | Exercise 2  | Basic Usage of R; Data Visualization | `nycflights13`; `pisa`   |
 | Exercise 3  | HCA; Heatmap  | `mrcars`  |
 | Exercise 4  | ROC AUC; CART | `ELS:02`; `pisa`  |
