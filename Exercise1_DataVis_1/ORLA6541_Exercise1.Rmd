@@ -1,0 +1,1237 @@
+---
+title: "ORLA6541_Exercise1"
+author: "Karlie (Yuxin) Meng, Maeghan Sill, & Summer Wu"
+date: "2024-09-30"
+output:
+  html_document:
+    keep_md: true
+---
+
+```{r}
+# Setting tibble width to view all columns 
+options(tibble.width = Inf)
+```
+
+# Wickham & Grolemund (2023)
+## Chapter 2 (Workflow: Basics)
+
+### Exercises 2.5
+
+**1. Why does this code not work?** 
+
+```{r}
+## my_variable <- 10
+## my_varıable
+##> Error: object 'my_varıable' not found
+```
+
+The code does not work because the object name `my_variable` was misspelled. The `i` was spelled as a `ı` when calling it. When referencing a previously assigned object, the spelling must match exactly as it was during assignment, since machines cannot interpret typos. 
+
+**2. Tweak each of the following R commands so that they run correctly:**  
+
+The original codes had some mistakes: <br>
+1. `Library`, `tidyverse`, and `mapping` were misspelled; <br>
+2. A comma was missing between the `x` and `y` parameters; <br>
+3. Quotation marks around `lm` were not complete. 
+
+```{r}
+## libary(todyverse)
+
+##ggplot(dTA = mpg) + 
+  ##geom_point(maping = aes(x = displ y = hwy)) +
+  ##geom_smooth(method = "lm)
+```
+
+See below for the corrected codes.
+
+```{r}
+# Correct spelling  
+library(tidyverse)
+
+# Missing comma between x and y parameters 
+ggplot(mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_point() +
+  # Incomplete quotation marks
+  geom_smooth(formula = y ~ x, method = "lm")
+```
+
+**3. Press Option + Shift + K / Alt + Shift + K. What happens? How can you get to the same place using the menus?** 
+
+This shortcut opens the "Keyboard Shortcut Quick Reference" page in RStudio, which display a list of commonly used default keyboard shortcuts. We can also access the page through the menues by navigating to "Tools -> Keyboard Shortcut Help".
+
+**4. Let’s revisit an exercise from the Section 1.6. Run the following lines of code. Which of the two plots is saved as mpg-plot.png? Why?** 
+
+```{r}
+## my_bar_plot <- ggplot(mpg, aes(x = class)) +
+  ## geom_bar()
+## my_scatter_plot <- ggplot(mpg, aes(x = cty, y = hwy)) +
+  ## geom_point()
+## ggsave(filename = "mpg-plot.png", plot = my_bar_plot)
+```
+
+The first plot, `my_bar_plot`, will be saved as mpg-plot.png because the codes passed `my_bar_plot` as the value for the plot parameter in the `ggsave()` function.
+
+## Chapter 3 (Data Transformation)
+
+### Exercises 3.2.5
+
+**1. In a single pipeline for each condition, find all flights that meet the condition:** 
+
+- Had an arrival delay of two or more hours
+
+```{r}
+# Importing the dataset
+library(nycflights13)
+
+flights |> 
+  filter(arr_delay >= 120) 
+```
+
+- Flew to Houston (`IAH` or `HOU`)
+
+```{r}
+flights |> 
+  filter(dest %in% c("IAH", "HOU"))
+```
+
+- Were operated by United, American, or Delta
+
+```{r}
+flights |> 
+  filter(carrier %in% c("UA", "AA", "DL")) 
+```
+
+- Departed in summer (July, August, and September)
+
+```{r}
+flights |> 
+  filter(month %in% c(7, 8, 9)) 
+```
+
+- Arrived more than two hours late but didn’t leave late
+
+```{r}
+flights |> 
+  filter(arr_delay > 120 & dep_delay <=0) 
+```
+
+- Were delayed by at least an hour, but made up over 30 minutes in flight
+
+```{r}
+flights |> 
+  filter(dep_delay >= 60 & (dep_delay - arr_delay) > 30)
+```
+
+
+**2. Sort `flights` to find the flights with the longest departure delays. Find the flights that left earliest in the morning.**
+
+Flight `HA 51` had the longest departure delay.
+
+```{r} 
+# Flight with longest departure delay
+flights |> 
+  arrange(desc(dep_delay))
+```
+
+The earliest time of departure was 12:01am (00:01). 
+
+```{r}
+# Flight with earliest departure 
+flights |> 
+  arrange(dep_time)
+```
+
+**3. Sort flights to find the fastest flights. (Hint: Try including a math calculation inside of your function.**
+
+The fastest flight was `US 1860` on `2013-01-28`. 
+
+```{r}
+# Finding the fastest flight. We assumed that "fastest" here means the flight's speed.
+flights |> 
+  arrange(distance / (air_time / 60))
+```
+
+**4. Was there a flight on every day of 2013?**
+
+Yes. There are 365 distinct combination of year, month, and day in the dataset, which means there was a flight on every day of 2013.
+
+```{r}
+# Distinct value of year, month, day 
+flights |> 
+  count(year, month, day) |>
+  filter(is.na(n) == FALSE) 
+```
+
+**5. Which flights traveled the farthest distance? Which traveled the least distance?**
+
+There is a tie for flights that traveled the farthest distance. One of the flights was `HA 51` on multiple days. 
+
+```{r}
+# Farthest distance
+flights |>
+  arrange(desc(distance))
+```
+
+Flight `US 1632` on `2013-07-27` traveled the least distance (*Wow, never knew there is such a short flight! I wonder how fast that would be, but unfortunately the value for `air_time` is missing. Okay, after the group discussion, we found out that flight was operated by US Airways, which has been merged by AA.*).
+
+```{r}
+# Least distance 
+flights |>
+  arrange(distance)
+```
+
+**6. Does it matter what order you used `filter()` and `arrange()` if you’re using both? Why/why not? Think about the results and how much work the functions would have to do.**
+
+In terms of results, the order of `filter()` and `arrange()` does not change the final output because `arrange()` only sorts the rows and does not modify or exclude them. However, the order may affect operational efficiency. Our group has two thoughts: 1) using `filter()` before `arrange()` is more efficient because `filter()` reduces the number of rows that need to be sorted; 2) using `arrange()` first enables faster `filter()` because it helps you to locate the rows to filter faster if you are applying both functions to the same variable.
+
+### Exercises 3.3.5
+
+**1. Compare `dep_time`, `sched_dep_time`, and `dep_delay` How would you expect those three numbers to be related?**
+
+Since `sched_dep_time` and `dep_time` respectively represents the scheduled departure time and the actual departure time, their difference will be the delay time represented by `dep_delay`. Mathematically speaking, the equation will be `dep_delay` = `sched_dep_time` - `dep_time`. However, the data format of`sched_dep_time` and `dep_time` should be transformed to do the calculation. It will also be more complicated for those whose `sched_dep_time` was before midnight and `dep_time` was after midnight. 
+
+**2. Brainstorm as many ways as possible to select `dep_time`, `dep_delay`, `arr_time`, and `arr_delay` from flights.**
+
+Method 1: Selecting individual variables
+
+```{r}
+flights |> 
+  select(dep_time, dep_delay, arr_time, arr_delay)
+```
+
+Method 2: Selecting variables using `start_with()`
+
+```{r}
+flights |>
+  select(starts_with(c("arr_", "dep_")))
+```
+
+Method 3: Selecting variables using column index. This approach will only work successfully if no columns are dropped or added to the dataframe, or the column indices will change. 
+
+```{r}
+flights |>
+  select(4, 6, 7, 9)
+```
+
+**3. What happens if you specify the name of the same variable multiple times in a `select()` call?**
+
+Specifying the same variable multiple times in a `select()` call has no effect; it works the same as specifying it once. As shown below, the output will only include the `carrier` column once. 
+
+```{r}
+# Specifying carrier for three times 
+flights |> 
+  select(carrier, carrier, carrier)
+```
+
+**4. What does the `any_of()` function do? Why might it be helpful in conjunction with this vector?** 
+
+This question was phrased differently in the earlier edition of the book, where they used `one_of()` instead of `any_of()`. To explore if the two functions work similarly, we tested both. It turns out that both functions behave in the same way, returning all columns that are predefined in the object variables.
+
+To better understand how `any_of()` works, we included a variable name that does not exist in the dataset within variables. This induced a warning, demonstrating the functions can handle such cases without failing. 
+
+These functions are particularly useful when working with a predefined vector. For instance, if we have stored some variable names in an object in previous steps, we can directly use this object instead of retyping all the variable names.
+
+```{r}
+# Define a vector named 'variables' that stores a set of column names as character strings.
+variables <- c("year", "month", "day", "century")
+
+# Testing one_of()
+flights |>
+  select(any_of(variables))
+
+# Trying one_of() function 
+flights |>
+  select(one_of(variables))
+```
+
+**5. Does the result of running the following code surprise you? How do the select helpers deal with upper and lower case by default? How can you change that default?**
+
+It was surprising to see the code successfully select variables with different cases, indicating that `select()` helpers are not case-sensitive by default. The help documentation confirms this: the default value for `ignore.case` is `TRUE.` If case sensitivity is required, set `ignore.case = FALSE`. 
+
+```{r}
+flights |> select(contains("TIME"))
+
+# Tried to change the default, and we succeeded
+## flights |> select(contains("TIME"), ignore.case = FALSE)
+```
+
+**6. Rename `air_time` to `air_time_min` to indicate units of measurement and move it to the beginning of the data frame.** 
+
+```{r}
+flights |>
+  # Renaming
+  rename(air_time_min = air_time) |>
+  # Moving to the first column
+  relocate(air_time_min)
+```
+
+**7. Why doesn’t the following work, and what does the error mean?**
+
+```{r}
+## flights |> 
+  ## select(tailnum) |> 
+  ## arrange(arr_delay)
+## > Error in `arrange()`:
+## > ℹ In argument: `..1 = arr_delay`.
+## > Caused by error:
+## > ! object 'arr_delay' not found
+```
+
+The code does not work because after using `select(tailnum)`, only the `tailnum` column is kept in the tibble. Therefore, the attempt to sort rows using `arrange(arr_delay)` fails because the `arr_delay` column no longer exists in the dataset.
+
+The error basically means no column called `arr_delay` was found in the dataset `flights`. 
+
+### Exercises 3.5.7 
+
+**1. Which carrier has the worst average delays? Challenge: can you disentangle the effects of bad airports vs. bad carriers? Why/why not? (Hint: think about `flights |> group_by(carrier, dest) |> summarize(n()))`** 
+
+For this question (actually some other questions as well), we found the prompt not very clear about whether the interested variable is departure delay or arrival delay. We decided to focus on arrival delay, since getting to the destination on time is usually the goal (though it is frustrating to wait at the origin airport). `F9` (Frontier Airlines) has the worst average arrival delays with an average delay time of about 22 minutes.
+
+```{r}
+# Calculating average delay by carriers
+flights |> 
+  group_by(carrier) |> 
+  summarize(avg_delays = mean(arr_delay, na.rm = TRUE)) |> 
+  arrange(desc(avg_delays)) 
+```
+
+It is challenging to determine whether airports contribute to delay time for `F9`, as all 685 flights carried by `F9` in 2013 were destined for the same airport. This lack of variation in destinations means we cannot compare `F9`'s on-time performance across different airports to see if delays are higher at specific locations. Therefore, it's not possible to conclude if `F9` tends to experience more delays at certain airports based on this data alone.
+
+```{r}
+# Investigating the airports for F9 
+flights |> 
+  group_by(carrier, dest) |> 
+  summarize(avg_delays = mean(arr_delay, na.rm = TRUE), n = n(), .groups = "drop") |> 
+  arrange(desc(avg_delays)) |> 
+  filter(carrier == "F9")
+```
+
+After a group discussion, we reconsidered the question. When examining the average delays across all carrier-destination pairs, we found that F9 is no longer at the top. Instead, EV appears to experience frequent delays at numerous airports, making it difficult to differentiate between the impact of airports and carriers.
+
+```{r}
+# Seeing all carrier-destination pairs 
+flights |> 
+  group_by(carrier, dest) |> 
+  summarize(avg_delays = mean(arr_delay, na.rm = TRUE), n = n(), .groups = "drop") |> 
+  arrange(desc(avg_delays))
+```
+
+**2. Find the flights that are most delayed upon departure from each destination.**
+
+```{r}
+# Finding the largest number in dep_delay in each origin group
+flights |>
+  group_by(origin) |>
+  slice_max(dep_delay, n = 1) |>
+  relocate(origin, carrier, flight)
+```
+
+**3. How do delays vary over the course of the day? Illustrate your answer with a plot.** 
+
+For this question, we had different interpretations regarding for "the course of the day" and also approached the visualization with different variables. But we ended up with similar observation -- flights get delayed more seriously throughout the day, more like a snowball effect. 
+
+> **Summer** used sechduled delay time as the x-axis and departure delay time as the y-axis.
+
+Based on the visualization, we can observe that: 
+
+- Most flights experience delays of less than 3 hours, as shown by the majority of points clustered below the 180-minute mark on the y-axis. 
+- The two peak periods for departure delays are between 6:00 and 10:00 AM, and 4:00 to 9:00 PM, where more significant delays and potential outliers are observed. 
+- There are no flights scheduled to depart before 5:00 AM, as evidenced by the absence of data points before this time on the x-axis.
+
+```{r, fig.width = 10}
+library(ggplot2)
+
+ggplot(flights, aes(x = sched_dep_time, y = dep_delay)) +
+  geom_point(na.rm = TRUE, color = "#0072B2", size = 1) +
+  scale_y_continuous(limits = c(0, 1100), breaks = seq(0, 1100, by = 60)) + 
+  scale_x_continuous(breaks = seq(0, 2359, by = 100),
+                     labels = function(x) sprintf("%02d:%02d", x %/% 100, x %% 100)) +
+  theme_minimal() +
+  labs(x = "Scheduled Departure Time",
+       y = "Departure Delay (mins)")
+```
+
+> **Maeghan** used departure time as the x-axis and departure delay time as the y-axis.
+
+```{r}
+ggplot(flights, aes(x = dep_time, y = dep_delay)) +
+  geom_point()
+```
+
+> **Karlie** picked a particular day, i.e., Janurary 1st, to visualize the delay. 
+
+```{r}
+#departure delay on Jan_1st
+Jan_1st <- flights |>
+            select(month, day, dep_delay,hour)|>
+             filter(month ==1 & day==1)|>
+              group_by(hour)|>
+               summarize(avg_delay_h = mean(dep_delay,na.rm =TRUE))
+
+Jan_1st  
+
+plot(x = Jan_1st$hour,
+     y = Jan_1st$avg_delay_h,
+     type = "b",
+     xlab = "Time in hour",
+     ylab = "Average delay",
+     xaxt = "n" )
+
+axis(1, at = Jan_1st$hour, labels = Jan_1st$hour)
+```
+
+**4. What happens if you supply a negative n to `slice_min()` and friends?**
+
+According to the help documentation, a negative value of `n` or `prop` will be subtracted from the group size. 
+
+I tested it using the codes below and noticed that: 
+
+1. The row number changed from 336,776 to 336,774 after `flights |> slice_head(n = -2)`, which indicates a negative number means how many rows to deselect. <br>
+2. After `flights |> group_by(dest) |> slice_max(dep_delay, n = -1, with_ties = FALSE)`, the number of row reduced to `336,671` from `336,776`, which means `115` rows were deselected. This is exactly the number of `dest` groups. 
+
+```{r}
+# Number of rows in raw data 
+print(nrow(flights))
+
+# Number of dest groups in raw data
+print(n_groups(group_by(flights, dest)))
+
+# Supplying negative value to n in slice_head
+flights |>
+  slice_head(n = -2)
+
+# Supplying negative value to n in slice_max
+flights |>
+  group_by(dest) |>
+  slice_max(dep_delay, n = -1, with_ties = FALSE) |> 
+  ungroup(dest)
+```
+
+**5. Explain what `count()` does in terms of the dplyr verbs you just learned. What does the sort argument to `count()` do?**
+
+The function `count()` works the same as using a combination of `group_by()` and `summarize(n = n())`. It helps us find the number of occurrences for each unique combination of the variables used for grouping.
+
+Using the `sort` argument with `count()` will arrange the rows in descending order based on the number of occurrences, making it easier to identify the most frequent groups.
+
+**6. Suppose we have the following tiny data frame:**
+
+```{r}
+df <- tibble(
+  x = 1:5,
+  y = c("a", "b", "a", "a", "b"),
+  z = c("K", "K", "L", "L", "K")
+)
+```
+
+- Write down what you think the output will look like, then check if you were correct, and describe what `group_by()` does.
+
+```{r}
+## df |>
+  ## group_by(y)
+```
+
+I think the output will be a tibble with 5 rows and 3 columns, grouped by the `y` variable into 2 groups (`a` and `b`), shown as `Groups:y [2]`. The `group_by()` function doesn't change the appearance of the tibble itself but adds metadata to indicate that subsequent operations will be performed separately for each group. This means that any following operations will be applied within each of these two groups (a and b) independently, treating the tibble as having two subsets.
+
+Based on the output, my answer is valid. 
+
+```{r}
+# Checking my answer 
+df |>
+ group_by(y)
+```
+- Write down what you think the output will look like, then check if you were correct, and describe what `arrange()` does. Also, comment on how it’s different from the `group_by()` in part (a).
+
+```{r}
+## df |>
+  ## arrange(y)
+```
+
+I think the output tibble will be sorted in ascending order based on the values of `y`, meaning all "a"s will come first, followed by all "b"s. 
+
+This output differs from the `group_by()` function in part (a) in two main ways:
+
+1. `arrange()` changes the order of the rows to sort by the specified variable(s), in this case, `y`. <br>
+2.  Unlike `group_by()`, `arrange()` does not add grouping metadata to the tibble. This means that the tibble is not treated as grouped for subsequent operations, and there is no information about groups in the output.
+
+Based on the output, my answer is valid. 
+
+```{r}
+# Checking my answer 
+df |>
+  arrange(y)
+```
+
+- Write down what you think the output will look like, then check if you were correct, and describe what the pipeline does.
+
+```{r}
+## df |>
+  ## group_by(y) |>
+  ## summarize(mean_x = mean(x))
+```
+
+Based on the codes, I think the output will have 2 columns: `y` and `mean_x`, with 2 rows representing the unique values of `y` -- `a` and `b`. The `mean_x` column will contain the mean of the x values within each group defined by y.
+
+The pipeline, first, groups the tibble by the values of `y`, treating all rows within the same `y` value as a single group. Then, it calculates the mean of the `x` values and stores the result in a new column called `mean_x.` 
+
+Based on the output, my answer is valid. 
+
+```{r}
+# Checking my answer 
+df |>
+  group_by(y) |>
+  summarize(mean_x = mean(x))
+```
+
+- Write down what you think the output will look like, then check if you were correct, and describe what the pipeline does. Then, comment on what the message says.
+
+```{r}
+## df |>
+  ## group_by(y, z) |>
+  ## summarize(mean_x = mean(x))
+```
+
+This pipeline is similar to the previous one, with the key difference being that it groups the tibble by both `y` and `z`. It creates groups based on all possible combinations of `y` and `z` values (i.e., `aK`, `aL`, `bK`), and then calculates the mean of `x` values within each group. Therefore, the output will be a tibble with 3 columns (`y`, `z`, `mean_x`) and 3 rows, and a message on grouping. 
+
+When I ran the code, I noticed that the message was slightly different from what I expected. I anticipated a reminder saying that the tibble is grouped by both `y` and `z.` However, the message only mentions `y` because, by default, dplyr drops the last grouping variable `z` after summarizing, retaining only the first grouping variable `y`. 
+
+```{r}
+# Checking my answer. 
+df |>
+  group_by(y, z) |>
+  summarize(mean_x = mean(x))
+```
+
+- Write down what you think the output will look like, then check if you were correct, and describe what the pipeline does. How is the output different from the one in part (d)?
+
+```{r}
+## df |>
+  ## group_by(y, z) |>
+  ## summarize(mean_x = mean(x), .groups = "drop")
+```
+
+Compared to part (d), this code will output a tibble without the message regarding groups, because this time, the code explicitly commands dplyr to drop all grouping with the `.groups = "drop"` argument.
+
+Based on the output, my answer is valid. 
+
+```{r}
+# Checking my answer 
+df |>
+  group_by(y, z) |>
+  summarize(mean_x = mean(x), .groups = "drop")
+```
+
+- Write down what you think the outputs will look like, then check if you were correct, and describe what each pipeline does. How are the outputs of the two pipelines different?
+
+```{r}
+## df |>
+  ## group_by(y, z) |>
+  ## summarize(mean_x = mean(x))
+
+## df |>
+  ## group_by(y, z) |>
+  ## mutate(mean_x = mean(x))
+```
+
+This code groups the data by all unique combinations of `y` and `z`, and then calculates the mean of x within each group, storing it in a new variable called `mean_x` with a grouping message.
+
+The resulting tibble will have 3 rows and 3 columns (`y`, `z`, `mean_x`), representing each unique combination of `y` and `z` with the corresponding mean of `x`.
+
+The output below verifies my anwser. 
+
+```{r}
+df |>
+  group_by(y, z) |>
+  summarize(mean_x = mean(x))
+```
+
+The second code also groups the data by `y` and `z`, and calculates the mean of `x` within each group. However, `mutate()` adds a new column `mean_x` to the original tibble without any message.
+
+The resulting tibble will have 5 rows and 4 columns (`x`, `y`, `z`, and `mean_x`). Each row will retain the original values of `x`, `y`, and `z`, with the new `mean_x` column showing the mean of `x` for each row.
+
+However, I didn't expect to see the second output also including group information. This reminds me that the pipeline itself does not permanently alter the contents of the original data frame; it only temporarily displays the modified output. To retain and use the modified version of the data frame later, it needs to be assigned to an object.
+
+```{r}
+# Checking my answer 
+df |>
+  group_by(y, z) |>
+  mutate(mean_x = mean(x))
+```
+
+## Chapter 4 (Workflow: Code Style)
+
+### Exercises 4.6
+
+**1. Restyle the following pipelines following the guidelines above.**
+
+Original pipelines:
+
+```{r}
+# Pipeline 1
+## flights|>filter(dest=="IAH")|>group_by(year,month,day)|>summarize(n=n(),
+## delay=mean(arr_delay,na.rm=TRUE))|>filter(n>10)
+
+# Pipeline 2
+## flights|>filter(carrier=="UA",dest%in%c("IAH","HOU"),sched_dep_time>
+## 0900,sched_arr_time<2000)|>group_by(flight)|>summarize(delay=mean(
+## arr_delay,na.rm=TRUE),cancelled=sum(is.na(arr_delay)),n=n())|>filter(n>10)
+```
+
+Restyled pipelines: 
+
+```{r}
+# Pipeline 1
+flights |> 
+  filter(dest == "IAH") |> 
+  group_by(year, month, day) |> 
+  summarize(
+    n = n(),
+    delay = mean(arr_delay, na.rm = TRUE)
+  ) |> 
+  filter(n > 10)
+
+# Pipeline 2
+flights |> 
+  filter(carrier == "UA",
+         dest %in% c("IAH", "HOU"),
+         sched_dep_time > 0900,
+         sched_arr_time < 2000) |> 
+  group_by(flight) |> 
+  summarize(
+    delay = mean(arr_delay, na.rm = TRUE),
+    cancelled = sum(is.na(arr_delay)),
+    n = n()
+  ) |> 
+  filter(n > 10)
+```
+
+## Chapter 5 (Data Tidying)
+
+> “Happy families are all alike; every unhappy family is unhappy in its own way.” <br>
+  — Leo Tolstoy
+
+> “Tidy datasets are all alike, but every messy dataset is messy in its own way.” <br>
+  — Hadley Wickham
+  
+> "All high-performing schools have small variance, but low-performing schools are different as they struggle in their own way." <br>
+  - Dr. Bowers 
+
+### Exercises 5.2.1 
+
+**1. For each of the sample tables, describe what each observation and each column represents.**
+
+```{r}
+table1
+```
+
+There are 4 columns and 6 rows in `table1`. 
+
+**columns:** <br>
+`country` represents the names of the countries in the dataset. <br>
+`year` indicates the year from which the data points are taken. <br>
+`cases` represents the number of tuberculosis (TB) cases. <br>
+`population` represents the population size.
+
+**rows:** <br>
+Each row contains the number of TB `cases` and the `population` of a specific `country` in a particular `year`.
+
+```{r}
+table2
+```
+There are 4 columns and 12 rows in `table2`.
+
+**columns:** <br>
+`country` represents the names of the countries in the dataset. <br>
+`year` indicates the year from which the data points are taken. <br>
+`type` describes the type of data recorded, either as `"cases"` or `"population"`. <br>
+`count` contains the numbers corresponding to the type of data.
+
+**rows:** <br>
+Each row provides either the number of TB cases or the population of a specific `country` for a particular `year`.
+
+```{r}
+table3
+```
+
+There are 3 columns and 6 rows in `table3`.
+
+**columns:** <br>
+`country` represents the names of the countries in the dataset. <br>
+`year` indicates the year from which the data points are taken. <br>
+`rate` column contains the numerical expression showing how to calculate the ratio of TB cases to the population for each country in a given year.
+
+**rows:** <br> 
+Each row provides a combination of the number of TB cases and the total population of a specific `country` in a particular `year`, formatted as `cases/population`.
+
+**2. Sketch out the process you’d use to calculate the rate for `table2` and `table3.` You will need to perform four operations:**
+
+- Extract the number of TB cases per country per year.
+- Extract the matching population per country per year.
+- Divide cases by population, and multiply by 10000.
+- Store back in the appropriate place.
+
+1. For `table2`:
+
+```{r}
+# Extracting count_TB_cases and count_population from table2
+operation_1_and_2_table2 <- table2|> 
+  pivot_wider(
+    names_from = type, 
+    values_from = count) |> 
+  rename(
+    count_TB_cases = cases,
+    count_population = population
+  ) |> 
+  mutate(
+    count_TB_cases = as.numeric(count_TB_cases),
+    count_population = as.numeric(count_population)
+  )
+
+# Calculating the rate and create a new variable called rate_TB from table2
+operation_3_and_4_table2 <- operation_1_and_2_table2 |>
+  mutate(rate_TB = count_TB_cases / count_population * 10000)
+
+# Show the tidied table2 
+operation_3_and_4_table2
+```
+
+2. For `table3`: 
+
+```{r}
+# Extracting count_TB_cases and count_population from table3
+operation_1_and_2_table3 <- table3 |> 
+  separate(rate, into = c("count_TB_cases", "count_population"), sep = "/") |>
+  mutate(
+    count_TB_cases = as.numeric(count_TB_cases),
+    count_population = as.numeric(count_population)
+  )
+
+# Calculating the rate and create a new variable called rate_TB from table3
+operation_3_and_4_table3 <- operation_1_and_2_table3 |>
+  mutate(rate_TB = count_TB_cases / count_population * 10000)
+
+# Show the tidied table3 
+operation_3_and_4_table3
+```
+
+## Chapter 6 (Workflow: Scripts and Projects)
+
+**1. Go to the RStudio Tips Twitter account, https://twitter.com/rstudiotips and find one tip that looks interesting. Practice using it!**
+
+> **Summer:** Wow! I didn't know [RStudio supports Python](https://posit.co/blog/rstudio-v1-4-preview-python-support/)!!! I’m currently working on projects in both R and Python, and I realized I code-switch between these two languages more than I do between English and Mandarin. It’s amazing that `reticulate` enables interfacing between R and Python in scripts and R Markdown. You can even interchange data between R and Python! This is fantastic for team collaboration where members use different programming languages, but you can still seamlessly work with each other's data!
+
+> **Maeghan:** There was a Twitter tip about using ViewPipeSteps by @daranzolin to make it easier to see what every step in a pipeline does by examining the data at each point in the transformation! https://github.com/daranzolin/ViewPipeSteps
+
+> **Karlie:** I found R studio has rainbow parenthesis. It makes it easy to see your layers of function in codes.Here's the link of the tips for using it: https://posit.co/blog/rstudio-1-4-preview-rainbow-parentheses/.
+
+**2. What other common mistakes will RStudio diagnostics report? Read https://support.posit.co/hc/en-us/articles/205753617-Code-Diagnostics to find out.**
+
+> **Summer:** Aha! This page made me realize that I hadn’t turned on all the diagnostics options.
+
+> **Maeghan:** I didn’t know that RStudio would tell you if you defined a variable but did not use it. I also did not know that the ‘i’ in a blue circle was a style diagnostic thatconforms to Hadley Wickham’s style guide. That’s super cool!
+
+> **Karlie:** I didn't know that R studio also have diagnostics for other languages, such as C / C++, JavaScript, and Python.
+
+## Chapter 7 (Data Import)
+
+```{r}
+students <- read_csv("https://pos.it/r4ds-students-csv", na = c("N/A", ""))
+```
+
+### Exercises 7.2.4
+
+**1. What function would you use to read a file where fields were separated with “|”?**
+
+Since "|" is a custom delimiter (different from the default comma or semicolon), the `read_delim()` function should be used.
+
+**2. Apart from file, skip, and comment, what other arguments do `read_csv()` and `read_tsv()` have in common?**
+
+`read_csv()` and `read_tsv()` share many other arguments, like `col_names`, `col_types`, `locale`, `na`, `quote`, `trim_ws`, etc.
+
+**3. What are the most important arguments to `read_fwf()`?**
+
+We think the most important element is the FILE, or the URL to the file. 
+
+Among all arguments, there are four most important arguments: <br>
+1. `fwf_empty()`: Guesses based on the positions of empty columns. <br>
+2. `fwf_widths()`: Supply the widths of the columns. <br>
+3. `fwf_positions()`: Supply paired vectors of start and end positions. <br>
+4. `fwf_cols()`: Supply named arguments of paired start and end positions or column widths.
+
+**4.Sometimes strings in a CSV file contain commas. To prevent them from causing problems, they need to be surrounded by a quoting character, like `"` or `'`. By default, `read_csv()` assumes that the quoting character will be `"`. To read the following text into a data frame, what argument to `read_csv()` do you need to specify?**
+
+```{r}
+## "x,y\n1,'a,b'"
+```
+
+To correctly read text where strings are enclosed in single quotes (`'`) instead of the default double quotes (`"`), we can specify the quote argument in the `read_csv()` function, as shown below. 
+
+```{r}
+read_csv("x,y\n1,'a,b'", quote = "'")
+```
+
+**5. Identify what is wrong with each of the following inline CSV files. What happens when you run the code?**
+
+1. `read_csv("a,b\n1,2,3\n4,5,6")` <br>
+The header (`a,b`) indicates there are two columns, but each row contains three values (`1,2,3` and `4,5,6`). <br>
+When running this code, `read_csv()` will throw an error that suggests the number of columns in the rows does not match the header. 
+
+```{r}
+read_csv("a,b\n1,2,3\n4,5,6")
+```
+
+2. `read_csv("a,b,c\n1,2\n1,2,3,4")` <br>
+The header (`a,b,c`) indicates there are three columns, but the first row has only two values (`1,2`), and the second row has four values (`1,2,3,4`). <br>
+Similar to the first one, the parsing error indicates the number of values in each row does not match the number of column headers.
+
+```{r}
+read_csv("a,b,c\n1,2\n1,2,3,4")
+```
+
+3. `read_csv("a,b\n\"1")` <br>
+The string `\"1` starts with a double quote but does not have a closing quote. <br>
+Running this code does not generate any warning, but no data has been read as values. 
+
+```{r}
+read_csv("a,b\n\"1")
+```
+
+4. `read_csv("a,b\n1,2\na,b")` <br>
+Technically, there is no errors in the codes, as the successful generated dataframe shows. However, the values in the second row contains the same values as the header (`a,b`), which can be confusing. 
+
+```{r}
+read_csv("a,b\n1,2\na,b")
+```
+
+5. `read_csv("a;b\n1;3")` <br>
+Here, the delimiter is not comma but semicolons. So instead of using `read_csv()`, we should use `read_csv2()`. <br>
+As the output shows, the code will be read as a single value since no delimiter (`,`) was detected. 
+
+```{r}
+read_csv("a;b\n1;3")
+```
+
+**6. Practice referring to non-syntactic names in the following data frame by:** 
+
+```{r}
+# Assigning data as a tibble named `annoying`
+annoying <- tibble(
+  `1` = 1:10,
+  `2` = `1` * 2 + rnorm(length(`1`))
+)
+```
+
+- Extracting the variable called `1`. 
+
+```{r}
+annoying |> 
+  select(`1`)
+```
+
+- Plotting a scatterplot of `1` vs. `2`. 
+
+```{r}
+annoying |> 
+  ggplot(aes(x = `1`, y = `2`)) +
+  geom_point()
+```
+
+- Creating a new column called `3`, which is `2` divided by `1`. <br>
+- Renaming the columns to `one`, `two`, and `three`. 
+
+```{r}
+annoying |> 
+  mutate(`3` = `2` / `1`) |>
+  rename(one = `1`,
+         two = `2`,
+         three = `3`)
+```
+
+# Bulut & Dejardins (2019)
+
+## Chapter 4 (Data Wrangling)
+
+### Exercises 4.2.1
+
+**1.Read in the pisa data set. Either the full data set (recommended to have 8 Gb of RAM) or one of the smaller data sets.**
+
+Reading the dataset is easy, but previewing the dataset can be challenging due to the size, so subsetting is important for big data wraggling.  
+
+```{r}
+# Importing data.table 
+library(data.table)
+
+# Reading pisa data 
+pisa <- fread("pisa2015.csv", na.strings = "")
+```
+
+### Exercises 4.3.1 
+
+**1. Subset all the "Female" students (`ST004D01T`) in "Germany"**
+
+To avoid displaying a lengthy data table in the output HTML, only the shape of the filtered data table is shown without the actual data.
+
+```{r}
+# Filtering German females 
+germany_female = pisa[ST004D01T == "Female" & CNTRYID == "Germany"]
+
+# Commenting the preview for better display
+## germany_female
+
+# Display the shape of the subset
+dim(germany_female)
+```
+
+**2. How many female students are there in Germany?**
+
+As the output from the first question shows, this data table is at student level, and there are 3197 rows in the DT. Therefore, there are 3197 female students in Germany. 
+
+**3. The `.N` function returns the length of a vector/number of rows. Use chaining with the `.N` function to answer Exercise 2.**
+
+```{r}
+# Using chaining with the .N function to get number of female students in Germany  
+pisa[ST004D01T == "Female" & CNTRYID == "Germany"
+     ][, .N]
+```
+
+### Exercises 4.4.1
+
+**1. The computer and software variables that were created above ask a student whether they had a computer in their home that they can use for school work (`computer`) and whether they had educational software in their home (`software`). Find the proportion of students in the Germany and Uruguay that have a computer in their home or have educational software.**
+
+Before answer the question directly, we need to make sure that the new columns like `computer` and `software` have been prepared. We can define a function to convert a dichotomous item (`yes/no`) to numeric scoring (`1/0`) and then apply the function to selected columns. 
+
+```{r}
+# Defining a function to convert dichotomous items to numerical binary coding
+bin_to_num <- function(x){
+  if (is.na(x)) NA
+  else if (x == "Yes") 1L
+  else if (x == "No") 0L 
+}
+```
+
+```{r}
+# Applying function to obtain computer and software variables 
+pisa[, `:=`
+     (computer = sapply(ST011Q04TA, bin_to_num),
+       software = sapply(ST011Q05TA, bin_to_num))]
+```
+
+We have created the variables `computer` and `software`, so now we can calculate the proportion of students in Germany and Uruguay that have a computer in their home or have educational software. Since both variables are binary (`0/1`), we can derive the proportion by calling the mean. 
+
+However, the question is stated a bit confusing. I am not sure how to interpret the "or" in the prompt. There are two approaches to understand this question:<br>
+1. Seeing the two conditions as independent: proportion of students owning a computer AND proportion of students owning a software <br>
+2: Finding the union of the two conditions: proportion of studetns owning a computer OR a software 
+
+Therefore, the codes below calculate all three proportions. 
+
+```{r}
+# Filtering the data to contain only students from Germany and Uruguay 
+pisa[CNTRYID %in% c("Germany", "Uruguay"),
+      # Calculating the proportion of these students who own a computer
+      .(prop_computer = mean(computer, na.rm = TRUE),
+        # Calculating the proportion of these students who own a software
+        prop_software = mean(software, na.rm = TRUE),
+        # Calculating the proportion of these students who own a computer or a software 
+        prop_computer_or_software = mean(computer == 1 | software == 1, na.rm = TRUE))]
+```
+
+**2. For just female students, find the proportion of students who have their own room (`own.room`) or a quiet place to study (`quiet.study`).**
+
+Similar to the first question, we need to create binary variables for the selected features. 
+
+```{r}
+# Converting female variable to binary
+pisa[, `:=`
+     (female = ifelse(ST004D01T == "Female", 1, 0),
+       own_room = sapply(ST011Q02TA, bin_to_num),
+       quiet_study = sapply(ST011Q03TA, bin_to_num))]
+```
+
+We can calculate the proportion now, using `mean()` again. Similarly, there are two ways to interpret the question, so three values are calculated.
+
+```{r}
+# Filtering data to contain only female students
+pisa[female == 1,
+     # Calculating proportion of these students who have their own room 
+     .(prop_own_room = mean(own_room, na.rm = TRUE),
+       # Calculating proportion of these students who have a quite study place
+       prop_quiet_study = mean(quiet_study, na.rm = TRUE),
+       # Calculating proportion of these students who have their own room or a quite study place
+       prop_own_room_or_quiet_study = mean(own_room == 1 | quiet_study == 1, na.rm = TRUE))]
+```
+
+### Exercises 4.5.1
+
+**1. Calculate the proportion of students who have art in their home (`art`) and the average age (`AGE`) of the students by gender.**
+
+First, we need to make sure `art` is created.
+
+```{r}
+# Converting ST011Q09TA to binary values  
+pisa[, `:=`
+     (art = sapply(ST011Q09TA, bin_to_num))]
+```
+
+Then, we can do the calculation.
+
+```{r}
+pisa[,
+     # Calculating proportion of students who have art in their home
+     .(prop_art = mean(art, na.rm = TRUE),
+       # Calculating average age of students 
+       mean_age = mean(AGE, na.rm = TRUE)),
+     # Changing grouping key human-readable name
+     by = .(sex = ST004D01T)]
+```
+
+**2. Within a by argument you can discretize a variable to create a grouping variable. Perform a median split for age within the by argument and assess whether there are age difference associated with having your own room (`own.room`) or a desk (`desk`).**
+
+First, create desk which is the binary presentation of `ST011Q01TA`.
+
+```{r}
+# Converting ST011Q01TA to binary values 
+pisa[, `:=`
+     (desk = sapply(ST011Q01TA, bin_to_num))]
+```
+
+Then, we can calculate the proportions in older age group and younger age group compared to median age. 
+
+```{r}
+pisa[,
+     # Calculating proportion of students that have their own room 
+     .(prop_own_room = mean(own_room, na.rm = TRUE),
+       # Calculating proportion of students that have their own desk
+       prop_desk = mean(desk, na.rm = TRUE)),
+     # Creating a discrete age variable based on median age in the sample 
+     by = .(age_group = ifelse(AGE > median(AGE, na.rm = TRUE), "Older", "Younger"))]
+```
+
+As we can see from the output above, there are some missing values in `AGE`. Therefore, we need to deal with those missing values, where two methods can be adopted.
+
+1. Filtering out those missing values before we do any calculation. <br>
+
+```{r}
+# Filtering out missing values of group
+pisa[!is.na(AGE),
+     # Calculating proportion of students that have their own room 
+     .(prop_own_room = mean(own_room, na.rm = TRUE),
+       # Calculating proportion of students that have their own desk
+       prop_desk = mean(desk, na.rm = TRUE)),
+     # Creating a discrete age variable based on median age in the sample 
+     by = .(age_group = ifelse(AGE > median(AGE, na.rm = TRUE), "Older", "Younger"))]
+```
+
+2. Naming the missing value group as "Unknown". 
+
+```{r}
+pisa[,
+     # Calculating proportion of students that have their own room 
+     .(prop_own_room = mean(own_room, na.rm = TRUE),
+       # Calculating proportion of students that have their own desk
+       prop_desk = mean(desk, na.rm = TRUE)),
+     # First condition: if AGE is missing value, age_group = "Unknown" 
+     by = .(age_group = ifelse(is.na(AGE), "Unknown",
+                              # Second condition: if AGE is larger than median_age, age_group = "Older"
+                               ifelse(AGE > median(AGE, na.rm = TRUE), "Older", "Younger")))]
+```
+
+### 4.8 Lab 
+
+**This afternoon when we discuss supervised learning, we’ll ask you to develop some models to predict the response to the question Do you expect your child will go into a ?" (`PA032Q03TA`).**
+
+**1. Recode this variable so that a “Yes” is 1 and a “No” is a -1 and save the variable as `sci_car`.**
+ 
+We can create a function to achieve this goal, like the book taught. Then, we can recode the variable by using the function. 
+
+```{r}
+# Defining a function to recode Yes to 1 and No to -1
+no_to_neg1 <- function(x){
+  if (is.na(x)) NA
+  else if (x == "Yes") 1L
+  else if (x == "No") -1L
+}
+
+# Applying the function to PA032Q03TA and create sci_car
+pisa[, `:=`
+     (sci_car = sapply(PA032Q03TA, no_to_neg1))]
+```
+
+**2. Calculate descriptive for this variable by `sex` and `country.` Specifically, the proportion of test takers whose parents said “Yes” or 1.**
+
+In addition to proportion, I also calculated the standard deviation, total number of records, and total number of valid responses. 
+
+```{r}
+pisa[, 
+     # Proportion of positive responses to sci_car
+     .(prop_sci_car = mean(sci_car == 1, na.rm = TRUE),
+       # Standard deviation
+       sd_sci_car = sd(sci_car, na.rm = TRUE), 
+       # Count of rows
+       count_sci_car = .N, 
+       # Count of non-null values 
+       valid_responses = sum(!is.na(sci_car))
+     ), 
+     # Setting group variables 
+     by = .(sex = ST004D01T, country = CNTRYID)]
+```
+
+**3. Means and standard deviations (sd) for the variables that you think will be most predictive of sci_car.**
+
+By reviewing the list of variables provided in the book, I believe that `JOYSCIE` (Enjoyment of Science), `INTBRSCI` (Interest in Broad Science Topics), and `SCIEACT` (Index of Science Activities) are likely to be the most predictive of sci_car.
+
+To better understand these variables, let's print a few rows to explore them further.
+
+```{r}
+# Displyaing 5 rows that contain no missing values in all variables. 
+head(pisa[complete.cases(JOYSCIE, INTBRSCI, SCIEACT), 
+          .(JOYSCIE, INTBRSCI, SCIEACT)], 
+     5)
+```
+
+Since these variables are all of the double type, we can proceed with calculating their descriptive statistics.
+
+```{r}
+pisa[,
+     # Mean and SD for Enjoyment of Science
+     .(mean_joy_scie = mean(JOYSCIE, na.rm = TRUE),
+       sd_joy_scie = sd(JOYSCIE, na.rm = TRUE),
+       
+       # Mean and SD for Interest in Broad Science Topic
+       mean_interest_scie_topics = mean(INTBRSCI, na.rm = TRUE),
+       sd_interest_scie_topics = sd(INTBRSCI, na.rm = TRUE),
+       
+       # Mean and SD for Index of Science Activities
+       mean_scie_activities = mean(SCIEACT, na.rm = TRUE),
+       sd_scie_activities = sd(SCIEACT, na.rm = TRUE))]
+```
+
+**4. Calculate these same descriptives by groups (by `sci_car` and by `sex`).**
+
+```{r}
+pisa[,
+     # Mean and SD for Enjoyment of Science
+     .(mean_joy_scie = mean(JOYSCIE, na.rm = TRUE),
+       sd_joy_scie = sd(JOYSCIE, na.rm = TRUE),
+       
+       # Mean and SD for Interest in Broad Science Topic
+       mean_interest_scie_topics = mean(INTBRSCI, na.rm = TRUE),
+       sd_interest_scie_topics = sd(INTBRSCI, na.rm = TRUE),
+       
+       # Mean and SD for Index of Science Activities
+       mean_scie_activities = mean(SCIEACT, na.rm = TRUE),
+       sd_scie_activities = sd(SCIEACT, na.rm = TRUE)),
+     
+     # Setting up the grouping variables 
+     by = .(sci_car, sex = ST004D01T)] 
+```
+
+**5. Calculate correlations between these variables and `sci_car`.**
+
+```{r}
+pisa[, 
+     .(cor_joy_scie = cor(sci_car, JOYSCIE, use = "complete.obs"),
+       cor_interest_scie_topics = cor(sci_car, INTBRSCI, use = "complete.obs"),
+       cor_scie_activities = cor(sci_car, SCIEACT, use = "complete.obs"))]
+```
+
+**6. Create new variables** <br>
+
+- Discretize the `math` and `reading` variables using the OECD means (490 for math and 493 for reading) and code them as 1 (at or above the mean) and -1 (below the mean), but do in the data.table way without using the $ operator.<br>
+
+Create variables `math` and `reading` from raw data. 
+
+```{r}
+# Creating new variables by averaging the ten rows 
+pisa[, `:=`
+     (math = rowMeans(pisa[, c(paste0("PV", 1:10, "MATH"))], na.rm = TRUE),
+       reading = rowMeans(pisa[, c(paste0("PV", 1:10, "READ"))], na.rm = TRUE))]
+```
+
+```{r}
+# Recoding math and reading based on OECD means 
+pisa[, `:=`
+     (recoded_math = ifelse(math >= 490, 1, -1),
+      recoded_reading = ifelse(reading >= 493, 1, -1))]
+```
+
+- Calculate the correlation between these variables and the list of variables above.
+
+```{r}
+pisa[, 
+     # Correlation coefficients for DISCLISCI
+     .(cor_math_discipline = cor(recoded_math, DISCLISCI, use = "complete.obs"),
+       cor_reading_discipline = cor(recoded_reading, DISCLISCI, use = "complete.obs"),
+       # Correlation coefficients for TEACHSUP
+       cor_math_teacher_support = cor(recoded_math, TEACHSUP, use = "complete.obs"),
+       cor_reading_teacher_support = cor(recoded_reading, TEACHSUP, use = "complete.obs"),
+       # Correlation coefficients for IBTEACH
+       cor_math_inquiry = cor(recoded_math, IBTEACH, use = "complete.obs"),
+       cor_reading_inquiry = cor(recoded_reading, IBTEACH, use = "complete.obs"))]
+```
+
+**7. Chain together a set of operations** <br>
+
+- For example, create an intermediate variable that is the average of `JOYSCIE` and `INTBRSCI`, and then calculate the mean by `country` by `sci_car` through chaining.
+
+```{r}
+pisa[, `:=`
+     # Average of JOYSCIE and INTBRSCI
+     (avg_scie_interest = (JOYSCIE + INTBRSCI) / 2)][,
+                                                     # Mean of average by by country and sci_car
+                                                     .(mean_avg_scie_interest = mean(avg_scie_interest, na.rm = TRUE)),
+                                                     by = .(CNTRYID, sci_car)]
+```
+
+**8. Transform variables, specifically recode `MISCED` and `FISCED` from characters to numeric variables.**
+
+This section failed... We tried every possible ways to recode the variables to numeric, using the book, Google, and ChatGPT, but we still weren't able to manage it using data.table. 
+
+```{r}
+# Method 1 of many methods we tried... :(
+parent_education_mapping <- list(
+  None = 0,
+  "ISCED 1" = 1,
+  "ISCED 2" = 2, 
+  "ISCED 3A, ISCED 4" = 3,
+  "ISCED 3B, C" = 4,
+  "ISCED 5A, 6" = 5, 
+  "ISCED 5B" = 6,
+  is.na = NA
+)
+
+## pisa[, MISCED_num := as.numeric(factor(MISCED, levels = names(parent_education_mapping), labels = unlist(parent_education_mapping)))]
+## pisa[, FISCED_num := as.numeric(factor(FISCED, levels = names(parent_education_mapping), labels = unlist(parent_education_mapping)))]
+```
+
+**9. Examine other variables in the pisa data set that you think might be predictive of `PA032Q03TA`.**
+
+We chose another numerical variable called `OUTHOURS`, and calculated its mean, sd, and correlation coefficient with `sci_car`. 
+
+We intended to see the correlation between parental education and `sci_car`, but we had so many difficulties (a world of pain) recoding them into numerical variables. We will investigate in how to do this using data.table. 
+
+```{r}
+pisa[, 
+     # Calculating mean of study time 
+     .(mean_out_study_time = mean(OUTHOURS, na.rm =TRUE),
+       # Calculating standard deviation of study time 
+       sd_out_study_time = sd(OUTHOURS, na.rm = TRUE),
+       # Calculating correlation coefficient between outside study hours and sci_car 
+       cor_study_time_scie_car = cor(OUTHOURS, sci_car, use = "complete.obs"))]
+```
+
+# Citation 
+
+OpenAI. (2024). ChatGPT (September 30, 2024). https://chat.openai.com/
+
+> "I have a categotical variable, and I need to recode them into numerical in data.table. Could you please tell me how to do this?" <br>
+> "To recode a categorical variable (like MISCED in your example) into numeric values in a data.table, you can use the fcase() function from data.table, or you can use dplyr's mutate() and case_when() if you're more comfortable with dplyr. Since you're working with a data.table, I'll focus on the data.table solution.<br>
+**Steps:**<br>
+Identify each category in your MISCED variable.<br>
+Map each category to a numeric value using fcase() or factor().<br>
+Here’s an example using fcase():<br>
+Solution using fcase() in data.table:<br>
+**Explanation:**<br>
+- fcase(): This is a powerful function in data.table that allows you to map conditions to values. Each condition is followed by the corresponding numeric value.<br>
+- MISCED_num: This creates a new column in the pisa dataset called MISCED_num with the recoded numeric values.<br>
+- NA_real_: This ensures that NA values are retained as NA."
+
+
