@@ -14,3 +14,23 @@ There were five required exercises in total, covering the following topics:
 5. classification and regression trees (CART),
 6. topic modeling. 
 
+# File Formats 
+
+All exercises were done using R Studio and the codes were written in Rmarkdown. For better preview on Github, a markdoown version for each exercise was also offered. However, I recommended viewing the html file for the best readability. Especially, some references were added using R-built-in functions, so they might not have been rendered in those markdown files. 
+
+# Exercise Contents 
+
+Each exercise was designed by Dr. Bowers for practicing different data science topics. You can find what contents were covered and the datasets used in each exercise in the following table. 
+
+| Exercise | Topics | Datasets | References |
+|----------|----------|----------|----------| 
+| Exercise 1  | Basic Usage of R; Data Visualization  | `nycflights13`; `pisa`  |-| 
+| Exercise 2  | Basic Usage of R; Data Visualization | `nycflights13`; `pisa`   |
+| Exercise 3  | HCA; Heatmap  | `mrcars`  |
+| Exercise 4  | ROC AUC; CART | `ELS:02`; `pisa`  |
+| Exercise 5  | Topic Modeling | `IMBd`  |
+
+# Comments 
+
+The author and her teammates were all biginners in Data Science. Though most of the work were replications, there were some data cleaning decisions made by ourselves. Therefore, there must be some mistakes or oversights in the markdowns. Please feel free to contac me if you find anything surprising, confusing, or concerning. 
+
