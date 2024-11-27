@@ -16,7 +16,12 @@ There were five required exercises in total, covering the following topics:
 
 # File Formats 
 
-All exercises were done using R Studio and the codes were written in Rmarkdown. For better preview on Github, a markdoown version for each exercise was also offered. However, I recommended viewing the html file for the best readability. Especially, some references were added using R-built-in functions, so they might not have been rendered in those markdown files. 
+All exercises were done using R Studio and the codes were written in Rmarkdown. For better preview on Github, a markdoown version for each exercise was also offered. However, Especially, some references were added using R-built-in functions, so they might not have been rendered in those markdown files, sp I recommended viewing the html file for the best readability, which can be found below. 
+
+|Exercise|Link|
+|--------|----|
+|Exercise 1| https://yuesummerwu.github.io/ORLA6541_Exercises/Exercise1_DataVis_1/ORLA6541_Exercise1.html|
+|Exercise 2| https://yuesummerwu.github.io/ORLA6541_Exercises/Exercise1_DataVis_2/ORLA6541_Exercise2.html|
 
 # Exercise Contents 
 
