@@ -21,7 +21,7 @@ All exercises were done using R Studio and the codes were written in Rmarkdown. 
 |Exercise|Link|
 |--------|----|
 |Exercise 1| https://yuesummerwu.github.io/ORLA6541_Exercises/Exercise1_DataVis_1/ORLA6541_Exercise1.html|
-|Exercise 2| https://yuesummerwu.github.io/ORLA6541_Exercises/Exercise1_DataVis_2/ORLA6541_Exercise2.html|
+|Exercise 2| https://yuesummerwu.github.io/ORLA6541_Exercises/Exercise2_DataVis_2/ORLA6541_Exercise2.html|
 
 # Exercise Contents 
 
