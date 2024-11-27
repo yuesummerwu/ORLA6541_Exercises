@@ -7,16 +7,17 @@ All these exercises utilzied open-access data, and the author tried to directly 
 # Topics Covered 
 
 There were five required exercises in total, covering the following topics: 
-1. basic usage of R,
-2. data visualization,
-3. hiarachical cluser analysis (HCA) and heatmaps,
-4. receiver operating characteristic (ROC),
-5. classification and regression trees (CART),
-6. topic modeling. 
+1. Basic usage of R
+2. Data visualization
+3. Hiarachical cluser analysis (HCA) and heatmaps
+4. Receiver operating characteristic (ROC)
+5. Area under the curve (AUC)
+6. Classification and regression trees (CART)
+7. Topic modeling
 
 # File Formats 
 
-All exercises were done using R Studio and the codes were written in Rmarkdown. For better preview on Github, a markdoown version for each exercise was also offered. However, some references were added using R-built-in functions, so they might not have been rendered in those markdown files, sp I recommended viewing the html file for the best readability, which can be found below. 
+All exercises were done using R Studio and the codes were written in Rmarkdown. For better preview on Github, a markdoown version for each exercise was also offered. However, some references were added using R-built-in functions, so they might not have been rendered in those markdown files, so I recommended viewing the html file for the best readability, which can be found below. 
 
 |Exercise|Link|
 |--------|----|
@@ -24,6 +25,7 @@ All exercises were done using R Studio and the codes were written in Rmarkdown. 
 |Exercise 2| https://yuesummerwu.github.io/ORLA6541_Exercises/Exercise2_DataVis_2/ORLA6541_Exercise2.html|
 |Exercise 3| https://yuesummerwu.github.io/ORLA6541_Exercises/Exercise3_HCA_Heatmap/ORLA6541_Exercise3.html|
 |Exercise 4| https://yuesummerwu.github.io/ORLA6541_Exercises/Exercise4_ROC_AUC_CART/ORLA6541_Exercise4.html|
+|Exercise 5| In progress|
 
 # Exercise Contents 
 
