@@ -24,7 +24,7 @@ These exercises provided a comprehensive foundation in data science techniques, 
 All exercises were completed using RStudio, with the code written in RMarkdown. For better previewing on GitHub, a Markdown version of each exercise is also provided. However, some references were generated using R's built-in functions and may not render correctly in the Markdown files. For the best readability and full functionality, it is recommended to view the corresponding HTML files, which can be found below.
 
 |Exercise|Link|
-|--------|----|
+|-----------|------------|
 |Exercise 1| https://yuesummerwu.github.io/ORLA6541_Exercises/Exercise1_DataVis_1/ORLA6541_Exercise1.html|
 |Exercise 2| https://yuesummerwu.github.io/ORLA6541_Exercises/Exercise2_DataVis_2/ORLA6541_Exercise2.html|
 |Exercise 3| https://yuesummerwu.github.io/ORLA6541_Exercises/Exercise3_HCA_Heatmap/ORLA6541_Exercise3.html|
